@@ -99,3 +99,43 @@ Exception: Exception: Exception: integrate_ode_rk45: initial state[3] is -nan, b
 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
 
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: integrate_ode_rk45:  Failed to integrate to next output time (442) in less than max_num_steps steps (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 122, column 9 to column 121) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: Exception: integrate_ode_rk45: initial state[3] is inf, but must be finite! (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 88, column 7 to column 114) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 109, column 9 to column 53) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: integrate_ode_rk45: initial state[3] is -nan, but must be finite! (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 122, column 9 to column 121) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: integrate_ode_rk45:  Failed to integrate to next output time (183) in less than max_num_steps steps (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 122, column 9 to column 121) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: Exception: integrate_ode_rk45: initial state[3] is inf, but must be finite! (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 88, column 7 to column 114) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 109, column 9 to column 53) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: integrate_ode_rk45: initial state[3] is -nan, but must be finite! (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 122, column 9 to column 121) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: integrate_ode_rk45:  Failed to integrate to next output time (59) in less than max_num_steps steps (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 122, column 9 to column 121) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: Exception: Exception: integrate_ode_rk45:  Failed to integrate to next output time (59) in less than max_num_steps steps (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 122, column 9 to column 121) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 138, column 11 to column 88) (in 'MZ_New_dynamics/stan_models/ki67_SHM_T2.stan', line 258, column 2 to column 64)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+

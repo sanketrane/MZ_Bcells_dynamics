@@ -209,3 +209,13 @@ Exception: normal_lpdf: Location parameter[1] is -nan, but must be finite! (in '
 If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
 but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
 
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: normal_lpdf: Location parameter[1] is -nan, but must be finite! (in 'MZ_New_dynamics/stan_models/ki67_SHM_FM.stan', line 313, column 2 to column 53)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
+Informational Message: The current Metropolis proposal is about to be rejected because of the following issue:
+Exception: normal_lpdf: Location parameter[1] is -nan, but must be finite! (in 'MZ_New_dynamics/stan_models/ki67_SHM_FM.stan', line 313, column 2 to column 53)
+If this warning occurs sporadically, such as for highly constrained variable types like covariance matrices, then the sampler is fine,
+but if this warning occurs often then your model may be either severely ill-conditioned or misspecified.
+
