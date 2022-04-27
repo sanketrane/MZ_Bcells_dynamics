@@ -1,0 +1,238 @@
+## clearing the environment
+rm(list = ls())  
+gc()    
+
+library(rstan)
+library(loo)
+library(tidyverse)
+####################################################################################
+
+## model specific details that needs to be change for every run
+modelName <- "shm"
+data_derived1 <- "T2MZP"    # name of the file for precursor pop
+data_derived2 <- paste("counts_MZ.csv", sep="")
+data_derived3 <- paste("Nfd_MZ.csv", sep="")
+data_derived4 <- paste("Ki67_MZ.csv", sep="") 
+
+## Setting all the directories for opeartions
+projectDir <- getwd()
+scriptDir <- file.path(projectDir, "scripts")
+modelDir <- file.path(projectDir, "models")
+dataDir <- file.path(projectDir, "datafiles")
+toolsDir <- file.path(scriptDir, "tools")
+outputDir <- file.path(projectDir, "output_fit")
+saveDir <- file.path(projectDir, 'save_csv')
+
+# loadiong the scr# loadiong the script that contains functions for plotting stan parameters
+source(file.path(toolsDir, "stanTools.R"))                # save results in new folder
+
+# compiling multiple stan objects together that ran on different nodes
+stanfit1 <- read_stan_csv(file.path(saveDir, paste0(modelName, "_", data_derived1, "_1.csv")))
+stanfit2 <- read_stan_csv(file.path(saveDir, paste0(modelName, "_", data_derived1, "_2.csv")))
+stanfit3 <- read_stan_csv(file.path(saveDir, paste0(modelName, "_", data_derived1, "_3.csv")))
+stanfit4 <- read_stan_csv(file.path(saveDir, paste0(modelName, "_", data_derived1, "_4.csv")))
+
+fit <- sflist2stanfit(list(stanfit1, stanfit2, stanfit3, stanfit4))
+
+#matrix_of_draws <- as.data.frame(fit)
+#
+#mean(matrix_of_draws$psi * exp(14.36)/exp(matrix_of_draws$y0_Log)* 100)
+#quantile(matrix_of_draws$psi  * exp(14.36)/exp(matrix_of_draws$y0_Log) * 100, probs = c(0.025, 0.975))
+#
+#mean(matrix_of_draws$lambdaFast_inv)
+#quantile(matrix_of_draws$lambdaFast_inv, probs = c(0.025, 0.975))
+#
+#mean(1/matrix_of_draws$rhoSlow)
+#quantile(1/matrix_of_draws$rhoSlow, probs = c(0.025, 0.975))
+#
+#
+#mean(matrix_of_draws$deltaSlow_inv)
+#quantile(matrix_of_draws$deltaSlow_inv, probs = c(0.025, 0.975))
+#
+#
+#mean(matrix_of_draws$Beta)
+#quantile(matrix_of_draws$Beta, probs = c(0.025, 0.975))
+#
+#mean(log(2)/matrix_of_draws$r_d)
+#quantile(log(2)/matrix_of_draws$r_d, probs = c(0.025, 0.975))
+#
+#
+#mean(matrix_of_draws$alpha)
+#quantile(matrix_of_draws$alpha, probs = c(0.025, 0.975))
+#
+
+# finding the parameters used in the model 
+# using the last parameter("sigma4") in the array to get the total number of parameters set in the model
+num_pars <- which(fit@model_pars %in% "sigma4")      # the variable "sigma4" will change depdending on the data used
+parametersToPlot <- fit@model_pars[1:num_pars]
+
+# number of post-burnin samples that are used for plotting 
+nPost <- nrow(fit)
+
+################################################################################################
+################################################################################################
+
+## loading required datasets for plotting
+counts_sorted <- read_csv(file.path(dataDir, data_derived2))%>% arrange(age.at.S1K)
+Nfd_sorted <- read_csv(file.path(dataDir, data_derived3))%>% arrange(age.at.S1K)
+ki67_sorted <- read_csv(file.path(dataDir, data_derived4))%>% arrange(age.at.S1K)
+
+# ################################################################################################
+# calculating PSIS-L00-CV for the fit
+counts_loglik <- extract_log_lik(fit, parameter_name = "log_lik1", merge_chains = TRUE)
+nfd_loglik <- extract_log_lik(fit, parameter_name = "log_lik2", merge_chains = TRUE)
+kidonor_loglik <- extract_log_lik(fit, parameter_name = "log_lik3", merge_chains = TRUE)
+kihost_loglik <- extract_log_lik(fit, parameter_name = "log_lik4", merge_chains = TRUE)
+
+log_lik_comb <- cbind(counts_loglik, nfd_loglik, kidonor_loglik, kihost_loglik)
+
+loo(kihost_loglik)
+# optional but recommended
+ll_array <- extract_log_lik(fit, parameter_name = "log_lik1", merge_chains = FALSE)
+r_eff <- relative_eff(exp(ll_array))
+
+# loo-ic values
+loo_loglik <- loo(log_lik_comb, save_psis = FALSE, cores = 8)
+
+# Widely applicable AIC
+AICw_lok <- waic(counts_loglik, nfd_loglik, kidonor_loglik, kihost_loglik)
+
+# AIC from LLmax
+#AIC_lok <-  -2 * max(combined_loglik)  + 2 * length(parametersToPlot)
+
+ploocv <- rbind("loo-ic"=loo_loglik$estimates[3], "WAIC" = AICw_lok$estimates[3])  #, "AIC" = AIC_lok)
+loo_loglik
+
+ploocv <- data.frame("Model" = paste0(modelName, "_", data_derived1),
+                     "elpd_loo" = round(loo_loglik$estimates[1], 2),
+                     "SE" = round(loo_loglik$estimates[4], 2), 
+                     "PLoo" = round(loo_loglik$estimates[2], 2))
+
+write.table(ploocv, file = file.path(outputDir, "stat_table.csv"),
+            sep = ",", append = T, quote = FALSE,
+            col.names = F, row.names = FALSE)
+
+################################################################################################
+### parameters table
+ptable <- monitor(as.array(fit, pars = parametersToPlot), warmup = 0, print = FALSE)
+out_table <- ptable[1:num_pars, c(1, 3, 4, 8)]
+write.csv(out_table, file = file.path(outputDir, paste0('params_', modelName, ".csv")))
+
+
+
+# time sequence for predictions specific to age bins within the data
+ts_pred1 <- 10^seq(log10(45), log10(750), length.out = 300)
+ts_pred2 <- 10^seq(log10(67), log10(750), length.out = 300)
+ts_pred3 <- 10^seq(log10(89), log10(750), length.out = 300)
+tb_pred1 <- rep(45, 300)
+tb_pred2 <- rep(67, 300)
+tb_pred3 <- rep(89, 300)
+numPred <- length(ts_pred1)
+
+
+
+# Total cell counts
+counts_binned <- counts_sorted%>%
+  mutate(age_bins = ifelse(age.at.bmt <= 56, "Age bin#1: <8Wks",
+                           ifelse(age.at.bmt <= 77, "Age bin#2: 8-12Wks", "Age bin#3: >12Wks")))
+
+# normalised donor fractions
+Nfd_binned <- Nfd_sorted %>%
+  mutate(age_bins = ifelse(age.at.bmt <= 56, "Age bin#1: <8Wks",
+                           ifelse(age.at.bmt <= 77, "Age bin#2: 8-12Wks", "Age bin#3: >12Wks")))
+
+## plotting ki67 predictions
+ki67_binned <- read_csv(file.path(dataDir, data_derived4))%>%
+  gather(- c(Lamis.ID, days.post.bmt, age.at.S1K, age.at.bmt), value = "prop_ki67hi", key = "subpopulation")%>%
+  mutate(age_bins = ifelse(age.at.bmt <= 56, "Age bin#1: <8Wks",
+                           ifelse(age.at.bmt <= 77, "Age bin#2: 8-12Wks", "Age bin#3: >12Wks")))
+
+
+myTheme <- theme(text = element_text(size = 10), axis.text = element_text(size = 10), axis.title =  element_text(size = 10, face = "bold"),
+                 plot.title = element_text(size=10,  hjust = 0.5, face = "bold"),
+                 legend.background = element_blank(), legend.key = element_blank(),
+                 legend.text = element_text(size=9), legend.title = element_text(9))
+
+# setting ggplot theme for rest fo the plots
+theme_set(theme_bw())
+
+fancy_scientific <- function(l) {
+  # turn in to character string in scientific notation
+  l <- format(l, scientific = TRUE)
+  # quote the part before the exponent to keep all the digits
+  l <- gsub("^(.*)e", "'\\1'e", l)
+  # remove + after exponent, if exists. E.g.: (e^+2 -> e^2)
+  l <- gsub("e\\+","e",l)  
+  # turn the 'e' into plotmath format
+  l <- gsub("e", "%*%10^", l)
+  # convert 1x10^ or 1.000x10^ -> 10^
+  l <- gsub("\\'1[\\.0]*\\'\\%\\*\\%", "", l)
+  # return this as an expression
+  parse(text=l)
+}
+
+log10minorbreaks=as.numeric(1:10 %o% 10^(4:8))
+
+# sourceing the file that has handwritten lengthy code for plotting observations
+source("scripts/MZ_plots.R")
+
+
+pdf(file = file.path(outputDir, paste0(modelName, "_", data_derived1, "_","Plots%03d.pdf")),
+    width = 7, height = 5, onefile = FALSE, useDingbats = FALSE )
+
+lay1 <- rbind(c(1,1,2,2),
+              c(NA,3,3,NA))
+toprow <- cowplot::plot_grid(counts_facet, nfd_comb,  labels = c("A", "B"), ncol = 2)
+cowplot::plot_grid(toprow, ki67_plot,  labels = c("", "C"), nrow = 2)
+
+
+dev.off()
+
+## open graphics device 
+## saving  plots for quality control 
+pdf(file = file.path(outputDir, paste(modelName,"StanPlots%03d.pdf", sep = "")),
+    width = 8, height = 5, onefile = FALSE, useDingbats = FALSE)
+pairs(fit, pars = parametersToPlot)
+options(bayesplot.base_size = 15,
+        bayesplot.base_family = "sans")
+color_scheme_set(scheme = "viridis")
+
+
+rhats <- rhat(fit, pars = parametersToPlot)
+mcmc_rhat(rhats) + yaxis_text() + myTheme
+
+ratios1 <- neff_ratio(fit, pars = parametersToPlot)
+mcmc_neff(ratios1) + yaxis_text() + myTheme
+
+posterior <- as.array(fit)
+mcmc_acf(posterior, pars = parametersToPlot) + myTheme
+
+mcmcHistory(fit, pars = parametersToPlot, nParPerPage = 4, myTheme = myTheme)
+
+mcmc_dens_overlay(posterior, parametersToPlot)
+mcmc_dens(posterior, parametersToPlot) + myTheme
+
+dev.off()
+
+################################################################################################
+################################################################################################
+## posterior predictive distributions
+
+# time sequence for predictions specific to age bins within the data
+# In this analysis 3 age bins were selected with mean ages for each bin as 44, 73 and 92 respectively.
+counts_agebmt_sorted <- counts_sorted %>% arrange(age.at.bmt)
+Median_agebin1 <- round(median(counts_agebmt_sorted$age.at.bmt[1:10]))
+Median_agebin2 <- round(median(counts_agebmt_sorted$age.at.bmt[11:30]))
+Median_agebin3 <- round(median(counts_agebmt_sorted$age.at.bmt[31:42]))
+
+
+## saving  plots for quality control 
+pdf(file = file.path(outputDir, paste(modelName,"IndPlots%03d.pdf", sep = "")),
+    width = 7, height = 8, onefile = FALSE, useDingbats = FALSE )
+
+cowplot::plot_grid(counts_plot, nfd_plot, ki67_plot, labels = c("A", "B", "C"),  nrow =  3)
+cowplot::plot_grid(counts_plot, nfd_plot, ki67_plot2, labels = c("A", "B", "C"),  nrow =  3)
+
+dev.off()
+
+
