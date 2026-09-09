@@ -1,5 +1,9 @@
-*.csv
-*.pdf
-*.out
-*.err
-/venv
+# Generated model outputs and local environments
+*.pkl
+Output (pkl)/
+.venv-1/
+venv/
+
+# Local metadata
+.DS_Store
+.ipynb_checkpoints/
