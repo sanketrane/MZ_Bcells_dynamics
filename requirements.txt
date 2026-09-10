@@ -1,0 +1,12 @@
+# Direct Python dependencies used by scripts and notebooks
+arviz
+cmdstanpy
+jupyter
+matplotlib
+numpy
+openpyxl
+pandas
+scikit-learn
+scipy
+seaborn
+xarray
