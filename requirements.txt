@@ -1,5 +1,12 @@
-certifi==2021.10.8
-charset-normalizer==2.0.12
-idna==3.3
-requests==2.27.1
-urllib3==1.26.9
+# Direct Python dependencies used by scripts and notebooks
+arviz
+cmdstanpy
+jupyter
+matplotlib
+numpy
+openpyxl
+pandas
+scikit-learn
+scipy
+seaborn
+xarray
